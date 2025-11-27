@@ -1,15 +1,49 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        //Cadastrar
+        Scanner sc = new Scanner(System.in);
+
+        AlunosDAO alunosDAO = new AlunosDAO();
+
+        System.out.println("====Cadastrando um aluno====");
+
+        System.out.println("Cadestre o nome do aluno ");
+        String nome = sc.nextLine();
+
+        System.out.println("Cadastre o email do aluno: ");
+        String email = sc.nextLine();
+
+        Alunos novo = new Alunos(nome,email);
+        alunosDAO.inserir(novo);
+
+        System.out.println("===Criando lista de Alunos===");
+        for(Alunos a : alunosDAO.listar()){
+            System.out.println(a.getId() + "_ " + a.getNome() + "_ " + a.getEmail());
         }
+        //Atualizar
+        System.out.println("\n ===Atualizar o Aluno===");
+        System.out.println("Digite o id que deseja atualizar: ");
+        int idAtualizar = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Novo nome: ");
+        String novoNome = sc.nextLine();
+
+        System.out.println("Novo email: ");
+        String novoEmail = sc.nextLine();
+
+        Alunos atualizado = new Alunos(idAtualizar,novoNome, novoEmail);
+        alunosDAO.atualizar(atualizado);
+
+        //Deletar
+
+        System.out.println("\n=== DELETAR UM ALUNO ===");
+        System.out.print("Digite o ID do aluno que deseja deletar: ");
+        int idDelete = sc.nextInt();
+        alunosDAO.deletar(idDelete);
+        sc.close();
     }
 }
