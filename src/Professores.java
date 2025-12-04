@@ -4,8 +4,7 @@ public class Professores {
     private double salario;
     private boolean status;
 
-    public Professores(int id, String nome, String email, String especialidade,
-                       double salario, String rua, int numero, String bairro, String cidade, boolean status){
+    public Professores(String nome, String email, String especialidade){
         this.nome = nome;
         this.email = email;
         this.especialidade = especialidade;
@@ -16,8 +15,7 @@ public class Professores {
         this.cidade = cidade;
         this.status = status;
     }
-    public Professores(int id,String nome,String email,String especialidade,
-                       String rua, int numero,String bairro,String cidade, boolean status){
+    public Professores(int id,String nome,String email,String especialidade){
         this.id = id;
         this.nome = nome;
         this.email = email;

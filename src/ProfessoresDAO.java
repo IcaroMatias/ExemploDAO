@@ -3,14 +3,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import static java.sql.DriverManager.getConnection;
 
 public class ProfessoresDAO {
-        // Inserir novos professores
+    public boolean emailExiste(String email){
+        String sql = "SELECT id FROM professores WHERE email = ? LIMIT 1";
+        try(Connection conn = Conexao.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setString(1,"email");
 
-        public void inserir(Professores professores) {
-            String sql = "INSERT INTO professores (nome, email, especialidade, salario," +
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+
+        } catch (Exception e) {
+            System.out.println("Erro ao verificar o email " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean cadastrarProfessor(Professores professores){
+        if ( emailExiste(professores.getEmail())) {
+            System.out.println("ERRO : Email ja cadastrado ! ");
+            return false;
+        }
+        return inserir(professores);
+    }
+
+    //Inserir novos professores
+    public boolean inserir(Professores professores) {
+        String sql = "INSERT INTO professores (nome, email, especialidade, salario," +
                     " rua, numero, bairro, cidade, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
             try (Connection conn = Conexao.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)){
 
@@ -31,7 +52,8 @@ public class ProfessoresDAO {
             } catch (Exception e) {
                 System.out.println("Erro ao inserir professor: " + e.getMessage());
             }
-        }
+        return false;
+    }
         //Listar todos os professores
 
         public List<Professores> listar() {
@@ -43,16 +65,9 @@ public class ProfessoresDAO {
                 ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Professores p = new Professores(
-                            rs.getInt("id"),
                             rs.getString("nome"),
                             rs.getString("email"),
-                            rs.getString("especialidade"),
-                            rs.getDouble("salario"),
-                            rs.getString("rua"),
-                            rs.getInt("numero"),
-                            rs.getString("bairro"),
-                            rs.getString("cidade"),
-                            rs.getBoolean("status")
+                            rs.getString("especialidade")
                     );
                     lista.add(p);
                 }
@@ -61,9 +76,37 @@ public class ProfessoresDAO {
             }
             return lista;
         }
-        //Atualizar
+    public Professores buscarPorId(int id) {
 
-        public void atualizar(Professores professores) {
+        String sql = "SELECT * FROM Professores WHERE id = ?";
+
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return new Professores(
+                            rs.getInt("id"),
+                            rs.getString("nome"),
+                            rs.getString("email"),
+                            rs.getString("senha")
+                    );
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar Professor: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    //Atualizar
+
+        public boolean atualizar(Professores professores) {
             String sql = "UPDATE alunos SET nome = ?, email = ?, especialidade = ?," +
                     " salario = ?, rua = ?, numero = ?, bairro = ?, cidade = ?, status = ? WHERE id = ?";
 
@@ -85,10 +128,11 @@ public class ProfessoresDAO {
             } catch (Exception e) {
                 System.out.println("Erro ao atualizar: " + e.getMessage());
             }
+            return false;
         }
         //Deletar
 
-        public void deletar(int id) {
+        public boolean deletar(int id) {
             String sql = "DELETE FROM professores WHERE id = ?";
             try (Connection conn = Conexao.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -99,5 +143,34 @@ public class ProfessoresDAO {
             } catch (Exception e) {
                 System.out.println("Erro ao deletar: " + e.getMessage());
             }
+            return false;
         }
+
+    public Professores login(String email, String senha) {
+
+        String sql = "SELECT * FROM professores WHERE email = ? AND senha = ? LIMIT 1 ";
+
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1,email);
+            stmt.setString(2,senha);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Professores(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("senha")
+                );
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erro no login: " + e.getMessage());
+        }
+
+        return null;
+    }
 }
